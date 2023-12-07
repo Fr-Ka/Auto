@@ -1,0 +1,158 @@
+
+---
+title: "Auto-mpg"
+author: "Fraydie Kaplan"
+date: "2023-12-07"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+
+## Linear Regression Analysis
+
+```{r setup, include=FALSE}
+# Set a CRAN mirror
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
+# Install/load necessary packages
+install.packages("caret")
+library(tidyverse)
+library(caret)
+```
+## Load and Explore the Dataset
+```{r}
+# Load the dataset
+df <- read.csv("C:/Users/Fraydie/Documents/random college/Semester 4/Data Science/Final Project/auto-mpg.csv")
+
+# Display summary
+summary(df)
+str(df)
+
+# Change horsepower to numeric
+df$horsepower <- as.numeric(df$horsepower)
+
+# Confirm horsepower was changed to numeric
+str(df)
+```
+
+# Exploratory Data Analysis
+
+## Scatter Plot of MPG vs. Weight
+```{r}
+# Scatter plot of mpg vs. weight
+ggplot(df, aes(x = weight, y = mpg)) +
+  geom_point() +
+  labs(title = "Scatter Plot of MPG vs. Weight",
+       x = "Weight",
+       y = "MPG") +
+  theme_minimal()
+```
+## Pair Plot to Visualize Relationships
+```{r}
+# Pair plot to visualize relationships between variables
+features_to_plot <- c("mpg", "displacement", "horsepower", "weight", "acceleration")
+pairs(df[, features_to_plot])
+```
+## Box Plot for MPG and Number of Cylinders
+```{r}
+# Box plot to show the distribution of mpg for different numbers of cylinders
+ggplot(df, aes(x = as.factor(cylinder), y = mpg)) +
+  geom_boxplot() +
+  labs(title = "Box Plot of MPG for Different Numbers of Cylinders",
+       x = "Number of Cylinders",
+       y = "MPG") +
+  theme_minimal()
+```
+# Linear Regression Modeling
+
+## Simple Linear Regression
+```{r}
+# Simple Linear Regression (using the first 300 samples)
+model_simple <- lm(mpg ~ weight, data = head(df, 300))
+summary(model_simple)
+```
+## Multiple Linear Regression
+```{r}
+# Multiple Linear Regression
+features <- c("cylinder", "displacement", "horsepower", "weight", "acceleration", "model.year", "origin")
+model_multiple <- lm(mpg ~ ., data = head(df, 300)[, c('mpg', features)])
+summary(model_multiple)
+```
+## Clean Data for Multiple Regression
+```{r}
+# Clean data for multiple regression (excluding "car.name")
+df_cleaned <- df[1:300, c("mpg", features)]
+df_cleaned <- na.omit(df_cleaned)
+# Ensure "car.name" is not included in remaining_data
+remaining_data <- df[301:398, c("mpg", features)]
+remaining_data$horsepower <- as.numeric(remaining_data$horsepower)
+str(remaining_data)
+```
+## Regression Model Logs
+```{r}
+# Log of Regression Models
+log_simple <- list("Simple Linear Regression",
+                   "Multiple R-squared" = summary(model_simple)$r.squared,
+                   "Adjusted R-squared" = summary(model_simple)$adj.r.squared,
+                   "Complete Linear Regression equation" = paste(names(coef(model_simple)), ": ", coef(model_simple), collapse = ", "))
+
+log_multiple <- list("Multiple Linear Regression",
+                     "Multiple R-squared" = summary(model_multiple)$r.squared,
+                     "Adjusted R-squared" = summary(model_multiple)$adj.r.squared,
+                     "Complete Linear Regression equation" = paste(names(coef(model_multiple)), ": ", coef(model_multiple), collapse = ", "))
+
+# Log the regression models
+log_simple <- unlist(log_simple)
+log_multiple <- unlist(log_multiple)
+log_simple
+log_multiple
+```
+# Diagnostic Plots for Regression Models
+
+## Simple Linear Regression
+```{r}
+# Diagnostic plots for Simple Linear Regression
+plot(model_simple, which = c(1, 2, 3, 5))
+```
+## Multiple Linear Regression
+```{r}
+# Diagnostic plots for Multiple Linear Regression
+plot(model_multiple, which = c(1, 2, 3, 5))
+```
+# Predictions and Residual Analysis
+
+## Predictions for the Remaining 98 Samples
+```{r}
+# Predictions for the Remaining 98 Samples
+predictions_simple <- predict(model_simple, newdata = remaining_data)
+predictions_multiple <- predict(model_multiple, newdata = remaining_data[, c('mpg', features)])
+```
+## Residual Plot for Simple Linear Regression
+```{r}
+# Residual Plot for Simple Linear Regression
+residuals_simple <- remaining_data$mpg - predictions_simple
+plot(predictions_simple, residuals_simple, main = "Residual Plot - Simple Linear Regression", xlab = "Predicted MPG", ylab = "Residuals")
+```
+## Histogram of Residuals for Simple Linear Regression
+```{r}
+# Histogram of Residuals for Simple Linear Regression
+hist(residuals_simple, main = "Histogram of Residuals - Simple Linear Regression", xlab = "Residuals", ylab = "Frequency")
+```
+## Residual Plot for Multiple Linear Regression
+```{r}
+# Residual Plot for Multiple Linear Regression
+residuals_multiple <- remaining_data$mpg - predictions_multiple
+plot(predictions_multiple, residuals_multiple, main = "Residual Plot - Multiple Linear Regression", xlab = "Predicted MPG", ylab = "Residuals")
+```
+## Histogram of Residuals for Multiple Linear Regression
+```{r}
+# Histogram of Residuals for Multiple Linear Regression
+hist(residuals_multiple, main = "Histogram of Residuals - Multiple Linear Regression", xlab = "Residuals", ylab = "Frequency")
+```
+
+
+
+
+

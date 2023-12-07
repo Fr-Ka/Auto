@@ -1,4 +1,4 @@
-
+https://fr-ka.github.io/Auto/Auto-mpg.html
 ---
 title: "Auto-mpg"
 author: "Fraydie Kaplan"

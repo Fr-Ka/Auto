@@ -1,0 +1,61 @@
+---
+title: "Callcenter"
+author: "Fraydie Kaplan"
+date: "2023-12-10"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Call-Center Dataset
+```{r}
+#load required packages
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+df <- read.csv("C:/Users/Fraydie/Documents/random college/Semester 4/Data Science/Final Project/Call_Center.csv")
+
+# Explore dataset
+print(str(df))
+summary(df)
+colnames(df)
+
+# Convert Call.Timestamp to a datetime object
+df$Call.Timestamp <- as.POSIXct(df$Call.Timestamp, format = "%m/%d/%y %H:%M")
+```
+# Question 1: Distribution of Call Durations
+```{r}
+# Create a histogram of call durations
+ggplot(df, aes(x = Call.Duration.In.Minutes)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(title = "Distribution of Call Durations",
+       x = "Call Duration (minutes)",
+       y = "Frequency")
+```
+# Question 2: CSAT Score Analysis
+```{r}
+# Create a boxplot of CSAT scores
+ggplot(df, aes(x = factor(Response.Time), y = Csat.Score, fill = factor(Response.Time))) +
+  geom_boxplot() +
+  labs(title = "CSAT Score Analysis by Response Time",
+       x = "Response Time",
+       y = "CSAT Score")
+```
+# Question 3: Sentiment Analysis
+```{r}
+# Create a bar plot of sentiments by channel
+ggplot(df, aes(x = Channel, fill = Sentiment)) +
+  geom_bar(position = "stack") +
+  labs(title = "Sentiment Analysis by Channel",
+       x = "Channel",
+       y = "Count",
+       fill = "Sentiment")
+```
+
+
